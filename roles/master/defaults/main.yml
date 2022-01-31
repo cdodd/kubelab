@@ -1,0 +1,7 @@
+master_admin_user:  "ubuntu"
+master_admin_group: "ubuntu"
+
+cluster_name: "k8s-cluster"
+
+master_apiserver_advertise_address: "192.168.101.100"
+master_pod_network_cidr: "192.168.112.0/20"

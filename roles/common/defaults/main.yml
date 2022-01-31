@@ -1,0 +1,78 @@
+################################################################################
+# Package Settings
+################################################################################
+
+upgrade_packages: false
+
+package_cache_valid_time: 600
+
+package_keys:
+- key: https://download.docker.com/linux/ubuntu/gpg
+- key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+package_repositories:
+- repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+- repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main" #k8s not available for Bionic (Ubuntu 18.04)
+
+package_names:
+- name: apt-transport-https
+- name: containerd.io
+- name: kubeadm
+- name: kubelet
+- name: kubectl
+
+################################################################################
+# Kernel Modules and Parameters
+################################################################################
+
+kernel_modules:
+  - name: overlay
+  - name: br_netfilter
+
+kernel_parameters:
+  - name: net.bridge.bridge-nf-call-iptables
+    value: 1
+  - name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+  - name: net.ipv4.ip_forward
+    value: 1
+
+################################################################################
+# PAM Settings
+################################################################################
+
+pam_domain: "*"
+
+pam_limits:
+  - comment: "Open file descriptors: soft"
+    type: soft
+    limit: nofile
+    value: 4096
+  - comment: "Open file descriptors: hard"
+    type: hard
+    limit: nofile
+    value: 65536
+  - comment: "Number of processes available to a single user: soft"
+    type: soft
+    limit: nproc
+    value: 2047
+  - comment: "Number of processes available to a single user: hard"
+    type: hard
+    limit: nproc
+    value: 16384
+  - comment: "Size of the stack segment of the process: soft"
+    type: soft
+    limit: stack
+    value: 10240
+  - comment: "Size of the stack segment of the process: hard"
+    type: hard
+    limit: stack
+    value: 32768
+  - comment: "Maximum locked memory limit mem lock 90% of RAM: soft"
+    type: soft
+    limit: memlock
+    value: 1887437
+  - comment: "Maximum locked memory limit mem lock 90% of RAM: hard"
+    type: hard
+    limit: memlock
+    value: 1887437

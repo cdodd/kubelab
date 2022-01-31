@@ -1,0 +1,52 @@
+#https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/configure-cgroup-driver/
+#https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta3/
+- name: Create kubeadm config
+  template:
+     src: kubeadm-config.yaml
+     dest: /home/{{ master_admin_user }}/kubeadm-config.yaml
+
+#https://docs.projectcalico.org/v3.6/getting-started/kubernetes/
+- name: Initialise cluster
+  command: kubeadm init --config /home/{{ master_admin_user }}/kubeadm-config.yaml
+  args:
+    creates: /etc/kubernetes/manifests/kube-apiserver.yaml
+
+- name: Create directory /home/{{ master_admin_user }}/.kube
+  file:
+    path: "/home/{{ master_admin_user }}/.kube"
+    state: directory
+
+- name: Copy kube config to /home/{{ master_admin_user }}/.kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest:  /home/{{ master_admin_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ master_admin_user }}"
+    group: "{{ master_admin_group }}"
+    mode: 0660
+
+- name: Copy kube config to local file
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: kubeconfig
+    flat: yes
+
+#Rewrite calico replacing defaults
+#https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
+- name: Create calico config
+  template:
+    src: calico/3.15/calico.yaml
+    dest: /home/{{ master_admin_user }}/calico.yaml
+
+- name: Apply calico config
+  become: false
+  command: kubectl apply -f /home/{{ master_admin_user }}/calico.yaml
+
+# Step 2.6 from https://kubernetes.io/blog/2019/03/15/kubernetes-setup-using-ansible-and-vagrant/
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Copy join command to local file
+  become: false
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ cluster_name }}-join-command"

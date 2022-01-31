@@ -1,0 +1,10 @@
+- name: Copy the join command
+  copy:
+    src: "./{{ cluster_name }}-join-command"
+    dest: /home/{{ node_admin_user }}/{{ cluster_name }}-join-command
+    owner: "{{ node_admin_user }}"
+    group: "{{ node_admin_group }}"
+    mode: 0760
+
+- name: Join the node to the cluster
+  command: sh /home/{{ node_admin_user }}/{{ cluster_name }}-join-command

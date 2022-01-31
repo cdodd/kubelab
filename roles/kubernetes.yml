@@ -1,0 +1,9 @@
+- hosts: k8s-m-*
+  become: yes
+  roles:
+    - { role: master}
+
+- hosts: k8s-n-*
+  become: yes
+  roles:
+    - { role: node}
