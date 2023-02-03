@@ -1,0 +1,107 @@
+################################################################################
+# Set up the Kubernetes cluster with kubeadm
+################################################################################
+
+- name: Copy kubeadm config into the VM
+  template:
+     src: kubeadm-config.yaml
+     dest: /home/vagrant/kubeadm-config.yaml
+
+- name: Initialise the Kubernetes cluster with kubeadm
+  command: kubeadm init --config /home/vagrant/kubeadm-config.yaml
+  args:
+    creates: /etc/kubernetes/manifests/kube-apiserver.yaml
+
+################################################################################
+# Configure the kube config file
+################################################################################
+
+- name: Create directory /home/vagrant/.kube
+  file:
+    path: "/home/vagrant/.kube"
+    state: directory
+
+- name: Copy kube config to /home/vagrant/.kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest:  /home/vagrant/.kube/config
+    remote_src: yes
+    owner: vagrant
+    group: vagrant
+    mode: 0660
+
+- name: Copy kube config to local file
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: ../kubeconfig
+    flat: yes
+
+################################################################################
+# Save the join command to a local file
+#
+# This is used later by worker nodes to join the cluster
+################################################################################
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Copy join command output to local file
+  become: false
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+
+################################################################################
+# Install CNI Plugin: Calico (3.25.0)
+################################################################################
+
+- name: Create Calico tigera operator manifest
+  template:
+    src: calico-3.25.0/tigera-operator.yaml
+    dest: /home/vagrant/tigera-operator.yaml
+  when: cni_plugin == "calico-3.25.0"
+
+- name: Apply Calico tigera operator manifest
+  become: false
+  command: kubectl create -f /home/vagrant/tigera-operator.yaml
+  when: cni_plugin == "calico-3.25.0"
+
+- name: Create Calico config
+  template:
+    src: calico-3.25.0/custom-resources.yaml
+    dest: /home/vagrant/custom-resources.yaml
+  when: cni_plugin == "calico-3.25.0"
+
+- name: Apply Calico config
+  become: false
+  command: kubectl create -f /home/vagrant/custom-resources.yaml
+  when: cni_plugin == "calico-3.25.0"
+
+################################################################################
+# Install CNI Plugin: Weave (2..8.1)
+################################################################################
+
+- name: Create Weave config
+  template:
+    src: weave-2.8.1/weave-daemonset-k8s.yaml
+    dest: /home/vagrant/weave-daemonset-k8s.yaml
+  when: cni_plugin == "weave-2.8.1"
+
+- name: Apply Weave config
+  become: false
+  command: kubectl apply -f /home/vagrant/weave-daemonset-k8s.yaml
+  when: cni_plugin == "weave-2.8.1"
+
+################################################################################
+# Install CNI Plugin: Flannel (0.20.2)
+################################################################################
+
+- name: Create flannel config
+  template:
+    src: flannel-0.20.2/kube-flannel.yaml
+    dest: /home/vagrant/kube-flannel.yaml
+  when: cni_plugin == "flannel-0.20.2"
+
+- name: Apply flannel config
+  become: false
+  command: kubectl apply -f  /home/vagrant/kube-flannel.yaml
+  when: cni_plugin == "flannel-0.20.2"

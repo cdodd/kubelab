@@ -1,0 +1,32 @@
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: systemd
+containerRuntime: remote
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: "{{ public_ip }}"
+  bindPort: 6443
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+apiServer:
+  timeoutForControlPlane: 4m0s
+  certSANs:
+    - "10.100.1.1"
+    - "{{ public_ip }}"
+clusterName: "{{  cluster_name }}"
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+networking:
+  podSubnet: "{{ pod_network_cidr }}"

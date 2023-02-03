@@ -1,0 +1,9 @@
+- hosts: master
+  become: yes
+  roles:
+    - { role: master }
+
+- hosts: node*
+  become: yes
+  roles:
+    - { role: node }

@@ -1,0 +1,138 @@
+################################################################################
+# Upgrade the OS packages (if upgrade_packages is set to true)
+################################################################################
+
+- name: Upgrade packages (if requested)
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+    update_cache: yes
+  when: upgrade_packages
+
+- name: Check if reboot is required
+  register: reboot_required_file
+  stat:
+    path: /var/run/reboot-required
+    get_md5: no
+
+- name: Reboot server
+  reboot:
+    msg: "Reboot initiated by Ansible due to kernel updates"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+  when: reboot_required_file.stat.exists
+
+################################################################################
+# Set up respositories and install the required packages
+################################################################################
+
+- name: Add repository keys
+  apt_key:
+    url: "{{item.key}}"
+  with_items: "{{ package_keys | default([])}}"
+  when: package_keys is defined and not (package_keys is none or package_keys | trim == '')
+  register: apt_keys
+
+- name: Add repositories
+  apt_repository:
+    repo: "{{item.repo}}"
+  with_items: "{{ package_repositories | default([])}}"
+  when: package_repositories is defined and not (package_repositories is none or package_repositories | trim == '')
+
+- name: Update apt cache
+  set_fact:
+    package_cache_valid_time: 0
+  when: apt_keys.changed
+
+- name: Install general packages
+  apt:
+    name: "{{ item.name }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{package_cache_valid_time}}"
+  with_items: "{{ general_package_names | default([])}}"
+  when: general_package_names is defined and not (general_package_names is none or general_package_names | trim == '')
+
+- name: Install Kubernetes packages
+  apt:
+    name: "{{ item.name }}={{ kubernetes_version }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{package_cache_valid_time}}"
+  with_items: "{{ kubernetes_package_names | default([])}}"
+  when: kubernetes_package_names is defined and not (kubernetes_package_names is none or kubernetes_package_names | trim == '')
+
+################################################################################
+# Disable swap
+#
+# As per the Kubernetes installation documentation, swap must be disabled:
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+################################################################################
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+################################################################################
+# Configure kernel modules and parameters
+################################################################################
+
+- name: Configure kernel modules
+  template:
+    src: etc/modules-load.d/containerd.conf
+    dest: /etc/modules-load.d/containerd.conf
+
+- name: Load kernel modules
+  modprobe:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ kernel_modules }}"
+
+- name: Configure kernel parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop: "{{ kernel_parameters }}"
+
+################################################################################
+# Configure the kubelet service
+################################################################################
+
+- name: Configure kubelet service
+  lineinfile:
+    path: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+    line: 'Environment="KUBELET_EXTRA_ARGS=--node-ip={{ public_ip }}"'
+    regexp: "KUBELET_EXTRA_ARGS="
+    insertafter: "[Service]"
+    state: present
+  notify: Restart kubelet
+
+################################################################################
+# BUG/HACK Workaround: Remove /etc/containerd/config.toml
+#
+# kubeadm is unable to detect containerd when the /etc/containerd/config.toml
+# file exists. See https://github.com/containerd/containerd/issues/4581
+################################################################################
+
+- name: Delete /etc/containerd/config.toml
+  file:
+    state: absent
+    path:  /etc/containerd/config.toml
+  notify: Restart containerd
+
+- name: Restart any modified services
+  meta: flush_handlers

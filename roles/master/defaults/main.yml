@@ -1,0 +1,2 @@
+cluster_name: kubelab
+pod_network_cidr: 192.168.112.0/20

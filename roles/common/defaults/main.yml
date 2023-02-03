@@ -1,0 +1,55 @@
+################################################################################
+# Package Settings
+################################################################################
+
+upgrade_packages: false
+
+package_cache_valid_time: 600
+
+package_keys:
+- key: https://download.docker.com/linux/ubuntu/gpg
+- key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+package_repositories:
+- repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+
+# The Kubernetes repository doesn't have packages for Ubuntu 20.04 (Focal Fossa)
+# However the 16.04 (Xenial Xerus) packages work and are actively updated, as
+# of 2023-02-03 (Kubernetes version 1.26).
+- repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+general_package_names:
+- name: apt-transport-https
+- name: containerd.io
+- name: etcd-client
+- name: net-tools
+- name: jq
+
+# The installation order of these packages is important when version pinning,
+# which this playbook does based on the "kubernetes_version" variable that is
+# passed in from the Vagrantfile.
+#
+# kubeadm will install kubelet and kubectl, but will install the latest
+# versions, even if a pinned, older version of kubeadm is being installed.
+# Install the packages in the below order to get a clean install with all
+# tools using the specified version.
+kubernetes_package_names:
+- name: kubectl
+- name: kubelet
+- name: kubeadm
+
+################################################################################
+# Kernel Modules and Parameters
+################################################################################
+
+kernel_modules:
+  - name: overlay
+  - name: br_netfilter
+
+kernel_parameters:
+  - name: net.bridge.bridge-nf-call-iptables
+    value: 1
+  - name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+  - name: net.ipv4.ip_forward
+    value: 1
