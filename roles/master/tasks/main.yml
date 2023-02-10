@@ -90,18 +90,3 @@
   become: false
   command: kubectl apply -f /home/vagrant/weave-daemonset-k8s.yaml
   when: cni_plugin == "weave-2.8.1"
-
-################################################################################
-# Install CNI Plugin: Flannel (0.20.2)
-################################################################################
-
-- name: Create flannel config
-  template:
-    src: flannel-0.20.2/kube-flannel.yaml
-    dest: /home/vagrant/kube-flannel.yaml
-  when: cni_plugin == "flannel-0.20.2"
-
-- name: Apply flannel config
-  become: false
-  command: kubectl apply -f  /home/vagrant/kube-flannel.yaml
-  when: cni_plugin == "flannel-0.20.2"

@@ -31,7 +31,6 @@ Vagrant.configure("2") do |config|
                 # Choose CNI plugin, currently supported:
                 # "calico-3.25.0"
                 # "weave-2.8.1"
-                # "flannel-0.20.2"
                 cni_plugin: "calico-3.25.0",
                 kubernetes_version: "1.26.0-00",
                 public_ip: "#{IP_BASE}10",
