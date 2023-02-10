@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
                 # "calico-3.25.0"
                 # "weave-2.8.1"
                 cni_plugin: "calico-3.25.0",
-                kubernetes_version: "1.26.0-00",
+                kubernetes_version: "1.26.1-00",
                 public_ip: "#{IP_BASE}10",
             }
         end
@@ -51,7 +51,7 @@ Vagrant.configure("2") do |config|
                 ansible.playbook = "roles/kubernetes.yml"
                 ansible.compatibility_mode = "2.0"
                 ansible.extra_vars = {
-                    kubernetes_version: "1.26.0-00",
+                    kubernetes_version: "1.26.1-00",
                     public_ip: "#{IP_BASE}#{10 + i}",
                 }
             end
