@@ -136,3 +136,32 @@
 
 - name: Restart any modified services
   meta: flush_handlers
+
+################################################################################
+# Install the crictl config file
+################################################################################
+
+- name: Install the crictl config file
+  template:
+    src: etc/crictl.yaml
+    dest: /etc/crictl.yaml
+
+################################################################################
+# Grant the vagrant user access to crictl
+################################################################################
+
+- name: Create a group for containerd access
+  ansible.builtin.group:
+    name: containerd
+    state: present
+
+- name: Add the vagrant user to the containerd group
+  ansible.builtin.user:
+    name: vagrant
+    groups: containerd
+    append: yes
+
+- name: Set group ownership of /run/containerd/containerd.sock to containerd
+  ansible.builtin.file:
+    path: /run/containerd/containerd.sock
+    group: containerd
