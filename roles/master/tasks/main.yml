@@ -54,13 +54,13 @@
 # Install CNI Plugin: Calico (3.25.0)
 ################################################################################
 
-- name: Create Calico tigera operator manifest
+- name: Create Calico tigera operator config
   template:
     src: calico-3.25.0/tigera-operator.yaml
     dest: /home/vagrant/tigera-operator.yaml
   when: cni_plugin == "calico-3.25.0"
 
-- name: Apply Calico tigera operator manifest
+- name: Apply Calico tigera operator config
   become: false
   command: kubectl create -f /home/vagrant/tigera-operator.yaml
   when: cni_plugin == "calico-3.25.0"
@@ -77,7 +77,7 @@
   when: cni_plugin == "calico-3.25.0"
 
 ################################################################################
-# Install CNI Plugin: Weave (2..8.1)
+# Install CNI Plugin: Weave (2.8.1)
 ################################################################################
 
 - name: Create Weave config
