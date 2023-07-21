@@ -1,0 +1,20 @@
+- name: "Download CNI plugins ({{ cni_plugins_version }})"
+  get_url:
+    url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz"
+    dest: /tmp/cni-plugins.tgz
+
+- name: Create /opt/cni/bin directory
+  file:
+    path: /opt/cni/bin
+    state: directory
+
+- name: Extract CNI plugins
+  unarchive:
+    src: /tmp/cni-plugins.tgz
+    remote_src: yes
+    dest: /opt/cni/bin
+
+- name: Remove CNI plugins download
+  file:
+    path: /tmp/cni-plugins.tgz
+    state: absent

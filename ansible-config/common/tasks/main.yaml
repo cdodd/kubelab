@@ -1,0 +1,32 @@
+- include_tasks: tasks/upgrade-os.yaml
+- include_tasks: tasks/disable-swap.yaml
+- include_tasks: tasks/configure-kernel.yaml
+- include_tasks: tasks/install-repos-and-utils.yaml
+
+# The following tasks includes are conditional as they are manual binary
+# installations from github and don't have the idempotency of system (deb)
+# packages.
+
+- name: Check if containerd exists
+  stat:
+    path: /usr/local/bin/containerd
+  register: containerd_binary
+- include_tasks: tasks/install-containerd.yaml
+  when: not containerd_binary.stat.exists
+
+- name: Check if runc exists
+  stat:
+    path: /usr/local/sbin/runc
+  register: runc_binary
+- include_tasks: tasks/install-runc.yaml
+  when: not runc_binary.stat.exists
+
+- name: Check if CNI plugins exist
+  stat:
+    path: /opt/cni/bin
+  register: cni_plugins_binary
+- include_tasks: tasks/install-cni-plugins.yaml
+  when: not cni_plugins_binary.stat.exists
+
+- include_tasks: tasks/configure-crictl.yaml
+- include_tasks: tasks/install-kubernetes.yaml

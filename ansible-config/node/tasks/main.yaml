@@ -1,0 +1,10 @@
+- name: Copy the kubeadm join command into the VM
+  copy:
+    src: ./join-command
+    dest: /root/join-command
+    owner: root
+    group: root
+    mode: 0760
+
+- name: Run the kubeadm join command
+  shell: /root/join-command

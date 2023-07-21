@@ -1,0 +1,9 @@
+- name: Copy kubeadm config into the VM
+  template:
+     src: kubeadm-config.yaml
+     dest: /home/vagrant/kubeadm-config.yaml
+
+- name: Initialise the Kubernetes cluster with kubeadm
+  command: kubeadm init --config /home/vagrant/kubeadm-config.yaml
+  args:
+    creates: /etc/kubernetes/manifests/kube-apiserver.yaml

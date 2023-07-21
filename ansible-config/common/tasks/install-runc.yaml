@@ -1,0 +1,16 @@
+- name: "Download the runc binary ({{ runc_version }})"
+  get_url:
+    url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.amd64"
+    dest: /tmp/runc
+
+- name: Install the runc binary
+  copy:
+    src: /tmp/runc
+    remote_src: yes
+    dest: /usr/local/sbin/runc
+    mode: "0755"
+
+- name: Remove runc download
+  file:
+    path: /tmp/runc
+    state: absent

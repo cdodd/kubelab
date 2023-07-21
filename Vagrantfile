@@ -1,4 +1,4 @@
-BOX_NAME = "ubuntu/focal64" # Ubuntu 20.04 LTS (Focal Fossa)
+BOX_NAME = "ubuntu/jammy64" # Ubuntu 22.04 LTS (Jammy Jellyfish)
 
 MASTER_CPU = 2
 MASTER_MEM = 2048
@@ -25,14 +25,10 @@ Vagrant.configure("2") do |config|
             v.cpus = MASTER_CPU
         end
         master.vm.provision "ansible" do |ansible|
-            ansible.playbook = "roles/kubernetes.yml"
+            ansible.playbook = "ansible-config/playbook.yaml"
             ansible.compatibility_mode = "2.0"
             ansible.extra_vars = {
-                # Choose CNI plugin, currently supported:
-                # "calico-3.25.0"
-                # "weave-2.8.1"
-                cni_plugin: "calico-3.25.0",
-                kubernetes_version: "1.26.1-00",
+                # kubernetes_version: "1.27.4-00", # Uncomment to override k8s version
                 public_ip: "#{IP_BASE}10",
             }
         end
@@ -48,10 +44,10 @@ Vagrant.configure("2") do |config|
                 v.cpus = NODES_CPU
             end
             node.vm.provision "ansible" do |ansible|
-                ansible.playbook = "roles/kubernetes.yml"
+                ansible.playbook = "ansible-config/playbook.yaml"
                 ansible.compatibility_mode = "2.0"
                 ansible.extra_vars = {
-                    kubernetes_version: "1.26.1-00",
+                    # kubernetes_version: "1.27.4-00", # Uncomment to override k8s version
                     public_ip: "#{IP_BASE}#{10 + i}",
                 }
             end
