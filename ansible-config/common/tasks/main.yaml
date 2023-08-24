@@ -3,7 +3,7 @@
 - include_tasks: tasks/configure-kernel.yaml
 - include_tasks: tasks/install-repos-and-utils.yaml
 
-# The following tasks includes are conditional as they are manual binary
+# The following task includes are conditional as they are manual binary
 # installations from github and don't have the idempotency of system (deb)
 # packages.
 

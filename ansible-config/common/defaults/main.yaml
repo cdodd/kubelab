@@ -36,7 +36,7 @@ general_package_names:
 #
 # kubeadm will install kubelet and kubectl, but will install the latest
 # versions, even if an older version of kubeadm is being installed. Install the
-# packages in the below order to get a clean install with all tools using the
+# packages in the order below to get a clean install with all tools using the
 # specified version.
 kubernetes_package_names:
 - name: kubectl
