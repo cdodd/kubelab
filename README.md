@@ -2,7 +2,7 @@
 
 A local kubernetes cluster of the following shape:
 
-- Kubernetes 1.27.4
+- Kubernetes 1.28
 - VM host: Vagrant & VirtualBox
 - OS: Ubuntu 22.04 LTS (Jammy Jellyfish)
 - Cluster creation: kubeadm
@@ -28,7 +28,7 @@ A local kubernetes cluster of the following shape:
 ```shell
 # Provision the cluster
 time vagrant up
-vagrant up  207.45s user 46.13s system 25% cpu 16:47.18 total
+vagrant up  68.20s user 35.50s system 14% cpu 11:38.24 total
 
 # Ansible writes the kubeconfig for the cluster to ./kubeconfig. Tell kubectl to
 # use this config:
@@ -37,10 +37,10 @@ export KUBECONFIG=${PWD}/kubeconfig
 # View the nodes of the cluster
 kubectl get nodes
 
-NAME     STATUS   ROLES           AGE   VERSION
-master   Ready    control-plane   12m   v1.27.4
-node1    Ready    <none>          6m    v1.27.4
-node2    Ready    <none>          57s   v1.27.4
+NAME     STATUS   ROLES           AGE     VERSION
+master   Ready    control-plane   8m33s   v1.28.0
+node1    Ready    <none>          4m26s   v1.28.0
+node2    Ready    <none>          77s     v1.28.0
 
 # Destroy the cluster
 vagrant destroy -f

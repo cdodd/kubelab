@@ -1,5 +1,5 @@
 cluster_name: kubelab
 
-cilium_version: 1.14.0
+cilium_version: 1.14.1
 
 pod_network_cidr: 192.168.112.0/20
