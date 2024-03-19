@@ -1,0 +1,17 @@
+- name: Download Tigera operator manifest
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/tigera-operator.yaml
+    dest: ~/tigera-operator.yaml
+
+- name: Apply Tigera operator manifest
+  kubernetes.core.k8s:
+    src: ~/tigera-operator.yaml
+
+- name: Download Calico manifest
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/custom-resources.yaml
+    dest: ~/custom-resources.yaml
+
+- name: Apply Calico manifest
+  kubernetes.core.k8s:
+    src: ~/custom-resources.yaml

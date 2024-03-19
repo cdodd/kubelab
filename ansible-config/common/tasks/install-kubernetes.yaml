@@ -9,12 +9,16 @@
 
 - name: Configure kubelet service
   lineinfile:
-    path: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+    path: "/usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf"
     line: 'Environment="KUBELET_EXTRA_ARGS=--node-ip={{ public_ip }}"'
     regexp: "KUBELET_EXTRA_ARGS="
     insertafter: "[Service]"
     state: present
   register: kubelet_config
+
+- name: Trigger systemd daemon-reload
+  systemd:
+    daemon-reload: yes
 
 - name: Restart kubelet service
   systemd:

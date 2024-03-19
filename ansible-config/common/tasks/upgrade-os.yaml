@@ -9,7 +9,7 @@
   register: reboot_required_file
   stat:
     path: /var/run/reboot-required
-    get_md5: no
+    get_checksum: no
 
 - name: Reboot server (if required)
   reboot:
