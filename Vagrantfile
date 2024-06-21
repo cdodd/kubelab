@@ -1,4 +1,4 @@
-BOX_NAME = "ubuntu/jammy64" # Ubuntu 22.04 LTS (Jammy Jellyfish)
+BOX_NAME = "bento/ubuntu-24.04" # (Noble Numbat)
 
 MASTER_CPU = 2
 MASTER_MEM = 2048
@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
             ansible.playbook = "ansible-config/playbook.yaml"
             ansible.compatibility_mode = "2.0"
             ansible.extra_vars = {
-                # kubernetes_version: "1.27.4-00", # Uncomment to override k8s version
+                # kubernetes_version: "1.30.2-1.1", # Uncomment to override k8s version
                 public_ip: "#{IP_BASE}10",
             }
         end
@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
                 ansible.playbook = "ansible-config/playbook.yaml"
                 ansible.compatibility_mode = "2.0"
                 ansible.extra_vars = {
-                    # kubernetes_version: "1.27.4-00", # Uncomment to override k8s version
+                    # kubernetes_version: "1.30.2-1.1", # Uncomment to override k8s version
                     public_ip: "#{IP_BASE}#{10 + i}",
                 }
             end

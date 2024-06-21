@@ -2,13 +2,13 @@
 # Kubernetes & container runtime versions
 ################################################################################
 
-kubernetes_version: "1.29.3-1.1"
+kubernetes_version: "1.30.2-1.1"
 
-cni_plugins_version: "1.4.1"
+cni_plugins_version: "1.5.1"
 
-containerd_version: "1.7.14"
+containerd_version: "1.7.18"
 
-runc_version: "1.1.12"
+runc_version: "1.1.13"
 
 ################################################################################
 # Package Settings
@@ -19,10 +19,10 @@ upgrade_packages: false
 package_cache_valid_time: 600
 
 package_keys:
-- key: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+- key: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
 
 package_repositories:
-- repo: "deb https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
+- repo: "deb https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
 
 general_package_names:
 - name: apt-transport-https
