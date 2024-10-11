@@ -1,5 +1,5 @@
 - include_tasks: tasks/initialise-cluster.yaml
 - include_tasks: tasks/configure-kubeconfig.yaml
 - include_tasks: tasks/create-join-command.yaml
-- include_tasks: tasks/install-python.yaml
-- include_tasks: tasks/install-calico.yaml
+- include_tasks: tasks/install-cilium.yaml
+# - include_tasks: tasks/install-calico.yaml

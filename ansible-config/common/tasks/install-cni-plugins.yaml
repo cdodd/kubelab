@@ -18,3 +18,10 @@
   file:
     path: /tmp/cni-plugins.tgz
     state: absent
+
+- name: Set CNI plugins file ownership
+  file:
+    path: /opt/cni/bin
+    owner: root
+    group: root
+    recurse: yes

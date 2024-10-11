@@ -7,26 +7,33 @@
 # installations from github and don't have the idempotency of system (deb)
 # packages.
 
-- name: Check if containerd exists
+- name: Check if containerd is installed
   stat:
     path: /usr/local/bin/containerd
   register: containerd_binary
 - include_tasks: tasks/install-containerd.yaml
   when: not containerd_binary.stat.exists
 
-- name: Check if runc exists
+- name: Check if runc is installed
   stat:
     path: /usr/local/sbin/runc
   register: runc_binary
 - include_tasks: tasks/install-runc.yaml
   when: not runc_binary.stat.exists
 
-- name: Check if CNI plugins exist
+- name: Check if CNI plugins are installed
   stat:
     path: /opt/cni/bin
   register: cni_plugins_binary
 - include_tasks: tasks/install-cni-plugins.yaml
   when: not cni_plugins_binary.stat.exists
+
+- name: Check if kubesec is installed
+  stat:
+    path: /usr/local/bin/kubesec
+  register: kubesec_binary
+- include_tasks: tasks/install-kubesec.yaml
+  when: not kubesec_binary.stat.exists
 
 - include_tasks: tasks/configure-crictl.yaml
 - include_tasks: tasks/install-kubernetes.yaml
