@@ -2,13 +2,19 @@
 # Kubernetes & container runtime versions
 ################################################################################
 
-kubernetes_version: "1.30.2-1.1"
+kubernetes_version: "1.31.1-1.1"
 
-cni_plugins_version: "1.5.1"
+cni_plugins_version: "1.6.0"
 
-containerd_version: "1.7.18"
+containerd_version: "1.7.23"
 
-runc_version: "1.1.13"
+runc_version: "1.2.0"
+
+################################################################################
+# Utility/tool versions
+################################################################################
+
+kubesec_version: "2.14.1"
 
 ################################################################################
 # Package Settings
@@ -19,17 +25,21 @@ upgrade_packages: false
 package_cache_valid_time: 600
 
 package_keys:
-- key: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+- key: https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key
+- key: https://baltocdn.com/helm/signing.asc
 
 package_repositories:
-- repo: "deb https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
+- repo: "deb https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /"
+- repo: "deb https://baltocdn.com/helm/stable/debian/ all main"
 
 general_package_names:
 - name: apt-transport-https
 - name: cri-tools # for crictl
 - name: etcd-client
+- name: helm
 - name: net-tools
 - name: jq
+- name: yq
 
 # The installation order of these packages is important when version pinning,
 # which this playbook does based on the "kubernetes_version" variable.

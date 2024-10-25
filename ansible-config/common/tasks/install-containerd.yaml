@@ -34,7 +34,7 @@
     regexp: 'SystemdCgroup \= false'
     line: 'SystemdCgroup = true'
 
-- name: Download the containerd service config
+- name: Download the systemd service config for containerd
   get_url:
     url: "https://raw.githubusercontent.com/containerd/containerd/main/containerd.service"
     dest: /etc/systemd/system/containerd.service
