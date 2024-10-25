@@ -1,0 +1,27 @@
+- name: Ensure /usr/local/bin exists
+  file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+
+- name: Download kubesec binary tarball
+  get_url:
+    url: https://github.com/controlplaneio/kubesec/releases/download/v{{ kubesec_version }}/kubesec_linux_amd64.tar.gz
+    dest: /tmp/kubesec_linux_amd64.tar.gz
+
+- name: Extract kubesec binary
+  unarchive:
+    src: /tmp/kubesec_linux_amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: yes
+
+- name: Ensure kubesec binary is executable
+  file:
+    path: /usr/local/bin/kubesec
+    mode: '0755'
+    state: file
+
+- name: Remove the kubesec download
+  file:
+    path: /tmp/kubesec_linux_amd64.tar.gz
+    state: absent
