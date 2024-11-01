@@ -1,0 +1,24 @@
+- name: Add apt keys
+  apt_key:
+    url: "{{ item }}"
+  with_items: "{{ package_keys }}"
+  register: apt_keys
+
+- name: Add apt repositories
+  apt_repository:
+    repo: "{{ item }}"
+  with_items: "{{ package_repositories }}"
+  register: apt_repos
+
+- name: Update apt cache
+  set_fact:
+    package_cache_valid_time: 0
+  when: apt_keys.changed or apt_repos.changed
+
+- name: Install apt packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ package_cache_valid_time }}"
+  with_items: "{{ general_package_names }}"

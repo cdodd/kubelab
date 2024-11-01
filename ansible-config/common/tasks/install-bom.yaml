@@ -1,0 +1,9 @@
+- name: "Download bom binary"
+  get_url:
+    url: "https://github.com/kubernetes-sigs/bom/releases/download/v{{ bom_version }}/bom-amd64-linux"
+    dest: /usr/local/bin/bom
+
+- name: Make bom binary executable
+  ansible.builtin.file:
+    path: /usr/local/bin/bom
+    mode: '0755'

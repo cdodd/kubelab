@@ -1,6 +1,8 @@
 # Auditing Task 1: Solution
 
-Solution to task [auditing-01.md](./auditing-01.md).
+[< Back to exercise list](../README.md)
+
+[< Back to auditing-01.md](./auditing-01.md)
 
 SSH onto the `master` and become root:
 
@@ -53,4 +55,24 @@ Add the following to the the API server arguments:
     - --audit-policy-file=/etc/kubernetes/audit.conf
     - --audit-log-path=/var/log/kube-audit.log
     - --audit-log-maxage=90
+```
+
+## Validate
+
+On the `master` host, tail the audit log file:
+
+```shell
+tail -f /var/log/kube-audit.log
+```
+
+Read the `db-pass` secret in the `prod` namespace and check the log file:
+
+```shell
+kubectl describe secret db-pass -n prod
+```
+
+Delete the `db-pass` secret and check the log file:
+
+```shell
+kubectl delete secret db-pass -n prod
 ```

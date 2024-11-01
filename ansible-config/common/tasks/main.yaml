@@ -1,7 +1,17 @@
-- include_tasks: tasks/upgrade-os.yaml
-- include_tasks: tasks/disable-swap.yaml
-- include_tasks: tasks/configure-kernel.yaml
-- include_tasks: tasks/install-repos-and-utils.yaml
+- name: Upgrade OS
+  include_tasks: tasks/upgrade-os.yaml
+
+- name: Disable swap
+  include_tasks: tasks/disable-swap.yaml
+
+- name: Configure kernel
+  include_tasks: tasks/configure-kernel.yaml
+
+- name: Install apt repositories and packages
+  include_tasks: tasks/install-apt-repos-and-packages.yaml
+
+- name: Install lab assets
+  include_tasks: tasks/install-lab-assets.yaml
 
 # The following task includes are conditional as they are manual binary
 # installations from github and don't have the idempotency of system (deb)
@@ -11,29 +21,63 @@
   stat:
     path: /usr/local/bin/containerd
   register: containerd_binary
-- include_tasks: tasks/install-containerd.yaml
+- name: Install containerd ({{ containerd_version }})
+  include_tasks: tasks/install-containerd.yaml
   when: not containerd_binary.stat.exists
 
 - name: Check if runc is installed
   stat:
     path: /usr/local/sbin/runc
   register: runc_binary
-- include_tasks: tasks/install-runc.yaml
+- name: Install runc ({{ runc_version }})
+  include_tasks: tasks/install-runc.yaml
   when: not runc_binary.stat.exists
 
 - name: Check if CNI plugins are installed
   stat:
     path: /opt/cni/bin
   register: cni_plugins_binary
-- include_tasks: tasks/install-cni-plugins.yaml
+- name: Install CNI plugins ({{ cni_plugins_version }})
+  include_tasks: tasks/install-cni-plugins.yaml
   when: not cni_plugins_binary.stat.exists
 
 - name: Check if kubesec is installed
   stat:
     path: /usr/local/bin/kubesec
   register: kubesec_binary
-- include_tasks: tasks/install-kubesec.yaml
+- name: Install kubesec ({{ kubesec_version  }})
+  include_tasks: tasks/install-kubesec.yaml
   when: not kubesec_binary.stat.exists
 
-- include_tasks: tasks/configure-crictl.yaml
-- include_tasks: tasks/install-kubernetes.yaml
+- name: Check if bom is installed
+  stat:
+    path: /usr/local/bin/bom
+  register: bom_binary
+- name: Install bom ({{ bom_version }})
+  include_tasks: tasks/install-bom.yaml
+  when: not bom_binary.stat.exists
+
+- name: Configure crictl
+  include_tasks: tasks/configure-crictl.yaml
+
+- name: Install kubernetes ({{ kubernetes_version }})
+  include_tasks: tasks/install-kubernetes.yaml
+
+# Reboot if required. This may be needed after installing kernel-level tools
+# like falco.
+
+- name: Check if reboot is required
+  register: reboot_required_file
+  stat:
+    path: /var/run/reboot-required
+    get_checksum: no
+
+- name: Reboot host (if required)
+  reboot:
+    msg: "Reboot initiated by Ansible due to kernel updates"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+  when: reboot_required_file.stat.exists

@@ -1,4 +1,4 @@
-- name: "Download CNI plugins ({{ cni_plugins_version }})"
+- name: "Download CNI plugins"
   get_url:
     url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz"
     dest: /tmp/cni-plugins.tgz

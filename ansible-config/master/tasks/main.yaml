@@ -1,5 +1,17 @@
-- include_tasks: tasks/initialise-cluster.yaml
-- include_tasks: tasks/configure-kubeconfig.yaml
-- include_tasks: tasks/create-join-command.yaml
-- include_tasks: tasks/install-cilium.yaml
-# - include_tasks: tasks/install-calico.yaml
+- name: Install Python
+  include_tasks: tasks/install-python.yaml
+
+- name: Initialise cluster
+  include_tasks: tasks/initialise-cluster.yaml
+
+- name: Configure kubeconfig
+  include_tasks: tasks/configure-kubeconfig.yaml
+
+- name: Create join command
+  include_tasks: tasks/create-join-command.yaml
+
+- name: Install Cilium
+  include_tasks: tasks/install-cilium.yaml
+
+- name: Initialise lab resources
+  include_tasks: tasks/initialise-lab-resources.yaml

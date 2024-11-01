@@ -1,4 +1,4 @@
-- name: "Download containerd ({{ containerd_version }})"
+- name: "Download containerd"
   get_url:
     url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz"
     dest: /tmp/containerd.tar.gz
