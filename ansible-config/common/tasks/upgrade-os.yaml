@@ -11,7 +11,7 @@
     path: /var/run/reboot-required
     get_checksum: no
 
-- name: Reboot server (if required)
+- name: Reboot host (if required)
   reboot:
     msg: "Reboot initiated by Ansible due to kernel updates"
     connect_timeout: 5

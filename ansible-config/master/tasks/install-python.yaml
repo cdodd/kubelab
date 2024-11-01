@@ -1,0 +1,15 @@
+################################################################################
+# Python is required for ansible to create kubernetes resources on the server,
+# such as creating namespaces before installing helm charts.
+################################################################################
+
+- name: Install Python packages
+  apt:
+    name:
+    - python3
+    - python3-pip
+
+- name: Install kubernetes Python package
+  pip:
+    name: kubernetes
+    extra_args: --break-system-packages

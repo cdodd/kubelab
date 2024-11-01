@@ -2,20 +2,20 @@
   copy:
       dest: /etc/modules-load.d/containerd.conf
       content: |
-        {% for module in kernel_modules -%}
-          {{ module.name }}
+        {% for module in enable_kernel_modules -%}
+          {{ module }}
         {% endfor %}
 
 - name: Load kernel modules
   modprobe:
-    name: "{{ item.name }}"
+    name: "{{ item }}"
     state: present
-  loop: "{{ kernel_modules }}"
+  loop: "{{ enable_kernel_modules }}"
 
-- name: Configure kernel parameters
+- name: Enable kernel parameters
   sysctl:
-    name: "{{ item.name }}"
-    value: "{{ item.value }}"
+    name: "{{ item }}"
+    value: 1
     state: present
     reload: yes
-  loop: "{{ kernel_parameters }}"
+  loop: "{{ enable_kernel_parameters }}"

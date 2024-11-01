@@ -1,0 +1,15 @@
+- name: Copy nginx apparmor profile into the VM
+  template:
+     src: apparmor-nginx
+     dest: /etc/apparmor.d/nginx-profile
+
+- name: Ensure the seccomp profile directory exists
+  file:
+    path: /var/lib/kubelet/seccomp/profiles
+    state: directory
+    mode: '0755'
+
+- name: Copy seccomp profile into the VM
+  template:
+     src: seccomp-profile.json
+     dest: /var/lib/kubelet/seccomp/profiles/custom-profile

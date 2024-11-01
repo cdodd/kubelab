@@ -1,11 +1,10 @@
-- name: "Install Kubernetes packages ({{ kubernetes_version }})"
+- name: "Install Kubernetes packages"
   apt:
-    name: "{{ item.name }}={{ kubernetes_version }}"
+    name: "{{ item }}={{ kubernetes_version }}"
     state: present
     update_cache: yes
-    cache_valid_time: "{{package_cache_valid_time}}"
-  with_items: "{{ kubernetes_package_names | default([])}}"
-  when: kubernetes_package_names is defined and not (kubernetes_package_names is none or kubernetes_package_names | trim == '')
+    cache_valid_time: "{{ package_cache_valid_time }}"
+  with_items: "{{ kubernetes_package_names }}"
 
 - name: Configure kubelet service
   lineinfile:

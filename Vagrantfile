@@ -8,14 +8,12 @@ NODE_CPU = 2
 NODE_MEM = 2048
 
 # This may need to be updated based on the host network(s) in your VirtualBox set up
-IP_BASE = "192.168.56."
+IP_BASE = "192.168.56"
 
 Vagrant.configure("2") do |config|
-    config.ssh.insert_key = false
-
     config.vm.define "master" do |master|
         master.vm.box = BOX_NAME
-        master.vm.network "private_network", ip: "#{IP_BASE}10"
+        master.vm.network "private_network", ip: "#{IP_BASE}.10"
         master.vm.hostname = "master"
         master.vm.synced_folder ".", "/vagrant", disabled: true
         master.vm.provider "virtualbox" do |v|
@@ -26,8 +24,8 @@ Vagrant.configure("2") do |config|
             ansible.playbook = "ansible-config/playbook.yaml"
             ansible.compatibility_mode = "2.0"
             ansible.extra_vars = {
-                # kubernetes_version: "1.31.1-1.1", # Uncomment to override Kubernetes version
-                public_ip: "#{IP_BASE}10",
+                public_ip: "#{IP_BASE}.10",
+                ansible_python_interpreter: "python3"
             }
         end
     end
@@ -35,7 +33,7 @@ Vagrant.configure("2") do |config|
     (1..NODE_COUNT).each do |i|
         config.vm.define "node#{i}" do |node|
             node.vm.box = BOX_NAME
-            node.vm.network "private_network", ip: "#{IP_BASE}#{10 + i}"
+            node.vm.network "private_network", ip: "#{IP_BASE}.#{10 + i}"
             node.vm.hostname = "node#{i}"
             node.vm.synced_folder ".", "/vagrant", disabled: true
             node.vm.provider "virtualbox" do |v|
@@ -46,8 +44,8 @@ Vagrant.configure("2") do |config|
                 ansible.playbook = "ansible-config/playbook.yaml"
                 ansible.compatibility_mode = "2.0"
                 ansible.extra_vars = {
-                    # kubernetes_version: "1.31.1-1.1", # Uncomment to override Kubernetes version
-                    public_ip: "#{IP_BASE}#{10 + i}",
+                    public_ip: "#{IP_BASE}.#{10 + i}",
+                    ansible_python_interpreter: "python3"
                 }
             end
         end

@@ -1,45 +1,64 @@
 ################################################################################
-# Kubernetes & container runtime versions
+# Kubernetes & plugin versions
 ################################################################################
 
-kubernetes_version: "1.31.1-1.1"
+# apt package version to use for kube{let,adm,ctl}
+kubernetes_version: "1.30.1-1.1"
 
+# https://github.com/containernetworking/plugins/releases
 cni_plugins_version: "1.6.0"
 
+# https://github.com/containerd/containerd/releases
 containerd_version: "1.7.23"
 
+# https://github.com/opencontainers/runc/releases
 runc_version: "1.2.0"
 
 ################################################################################
-# Utility/tool versions
+# Utility/tool versions (binary downloads from GitHub)
 ################################################################################
 
+# https://github.com/kubernetes-sigs/bom/releases
+bom_version: "0.6.0"
+
+# https://github.com/controlplaneio/kubesec/releases
 kubesec_version: "2.14.1"
 
 ################################################################################
-# Package Settings
+# APT Package Config
 ################################################################################
 
 upgrade_packages: false
 
 package_cache_valid_time: 600
 
+# NOTE: If the "kubernetes_version" variable is updated, the key URL below needs
+#       to match the associated version.
 package_keys:
-- key: https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key
-- key: https://baltocdn.com/helm/signing.asc
+  - https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+  - https://baltocdn.com/helm/signing.asc
+  - https://falco.org/repo/falcosecurity-packages.asc
+  - https://aquasecurity.github.io/trivy-repo/deb/public.key
 
+# NOTE: If the "kubernetes_version" variable is updated, the repo below needs to
+#       match the associated version.
 package_repositories:
-- repo: "deb https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /"
-- repo: "deb https://baltocdn.com/helm/stable/debian/ all main"
+  - deb https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+  - deb https://baltocdn.com/helm/stable/debian/ all main
+  - deb https://download.falco.org/packages/deb stable main
+  - deb https://aquasecurity.github.io/trivy-repo/deb noble main
 
 general_package_names:
-- name: apt-transport-https
-- name: cri-tools # for crictl
-- name: etcd-client
-- name: helm
-- name: net-tools
-- name: jq
-- name: yq
+  - apt-transport-https
+  - cri-tools # for crictl
+  - etcd-client
+  - helm
+  - net-tools
+  - jq
+  - yq
+  - falco
+  - sysdig
+  - trivy
 
 # The installation order of these packages is important when version pinning,
 # which this playbook does based on the "kubernetes_version" variable.
@@ -49,22 +68,19 @@ general_package_names:
 # packages in the order below to get a clean install with all tools using the
 # specified version.
 kubernetes_package_names:
-- name: kubectl
-- name: kubelet
-- name: kubeadm
+  - kubectl
+  - kubelet
+  - kubeadm
 
 ################################################################################
 # Kernel Modules and Parameters
 ################################################################################
 
-kernel_modules:
-  - name: overlay
-  - name: br_netfilter
+enable_kernel_modules:
+  - overlay
+  - br_netfilter
 
-kernel_parameters:
-  - name: net.bridge.bridge-nf-call-iptables
-    value: 1
-  - name: net.bridge.bridge-nf-call-ip6tables
-    value: 1
-  - name: net.ipv4.ip_forward
-    value: 1
+enable_kernel_parameters:
+  - net.bridge.bridge-nf-call-iptables
+  - net.bridge.bridge-nf-call-ip6tables
+  - net.ipv4.ip_forward
